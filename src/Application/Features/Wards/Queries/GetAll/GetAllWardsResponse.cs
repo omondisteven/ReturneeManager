@@ -1,0 +1,9 @@
+﻿namespace ReturneeManager.Application.Features.Wards.Queries.GetAll
+{
+    public class GetAllWardsResponse
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+    }
+}

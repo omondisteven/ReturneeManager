@@ -1,0 +1,275 @@
+﻿@*AddEditPersonModal.razor*@
+@page "/catalog/add-person/{id:int}"
+@inject Microsoft.Extensions.Localization.IStringLocalizer<AddEditPersonModal> _localizer
+@using MudBlazor
+@using System
+
+<EditForm Model="@AddEditPersonModel" OnValidSubmit="SaveAsync">
+    <FluentValidationValidator @ref="_fluentValidationValidator" />
+    <MudDialog>
+        <TitleContent>
+            @{
+                if (AddEditPersonModel.Id == 0)
+                {
+                    <MudText Typo="Typo.h6">
+                        <MudIcon Icon="@Icons.Material.Filled.Add" Class="mr-3 mb-n1" />
+                        @_localizer["Beneficiary Screening Form - Add Beneficiary"]
+                    </MudText>
+                }
+                else
+                {
+                    <MudText Typo="Typo.h6">
+                        <MudIcon Icon="@Icons.Material.Filled.Update" Class="mr-3 mb-n1" />
+                        @_localizer["Beneficiary Screening Form - Update Beneficiary"]
+                    </MudText>
+                }
+            }
+        </TitleContent>
+        <DialogContent>
+            <div style="max-height: 500px; overflow-y: auto;">
+            <MudGrid>
+                    @if (AddEditPersonModel.Id != 0)
+                    {
+                        <MudItem xs="12" md="4">
+                            <div>
+                                @_localizer["Id"]
+                            </div>
+                            <MudTextField Disabled For="@(() => AddEditPersonModel.Id)" @bind-Value="AddEditPersonModel.Id" Label="" />
+                            </MudItem>
+                    }
+                    <MudItem xs="12" md="12">
+                        <div style="background-color: blue; color: white; font-weight: bold; padding: 4px; font-size: 12px;">
+                            PERSONAL INFORMATION
+                        </div>
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <div>
+                            @_localizer["Person's Identification Type"]
+                        </div>
+                        <MudAutocomplete T="int" Label="@_localizer["Select"]" For="@(() => AddEditPersonModel.IdTypeId)" @bind-Value="AddEditPersonModel.IdTypeId" ResetValueOnEmptyText="true" SearchFunc="@SearchIdTypes" ToStringFunc="@(i => _idTypes.FirstOrDefault(b => b.Id == i)?.Name ?? string.Empty)" OffsetY="true" Filter="Auto.None" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <div>
+                            @_localizer["Identification Number"]
+                        </div>
+                        <MudTextField For="@(() => AddEditPersonModel.IdNumber)" @bind-Value="AddEditPersonModel.IdNumber" Label="" Disabled="@IsIdNumberDisabled" />
+                    </MudItem>
+                    <MudItem xs="12" md="3">
+                        <div>
+                            @_localizer["Date of Birth"]
+                        </div>
+                        <MudDatePicker @bind-Date="AddEditPersonModel.DateOfBirth" Label="" />
+                    </MudItem>
+
+
+                    <MudItem xs="12" md="4">
+                        <div>
+                            @_localizer["Name"]
+                        </div>
+                        <MudTextField For="@(() => AddEditPersonModel.Name)" @bind-Value="AddEditPersonModel.Name" Label="" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <div>
+                            @_localizer["Father's Name"]
+                        </div>
+                        <MudTextField For="@(() => AddEditPersonModel.FatherName)" @bind-Value="AddEditPersonModel.FatherName" Label="" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <div>
+                            @_localizer["Mother's Name"]
+                        </div>
+                        <MudTextField For="@(() => AddEditPersonModel.MotherName)" @bind-Value="AddEditPersonModel.MotherName" Label="" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <div>
+                            @_localizer["Gender"]
+                        </div>
+                        <MudAutocomplete T="int" Label="@_localizer["Select"]" For="@(() => AddEditPersonModel.GenderId)" @bind-Value="AddEditPersonModel.GenderId" ResetValueOnEmptyText="true" SearchFunc="@SearchGenders" ToStringFunc="@(i => _genders.FirstOrDefault(b => b.Id == i)?.Name ?? string.Empty)" OffsetY="true" Filter="Auto.None" />
+                    </MudItem>
+                <MudItem xs="12" md="4">
+                        <div>
+                            @_localizer["Mobile Number"]
+                        </div>
+                        <MudTextField For="@(() => AddEditPersonModel.MobileNumber)" @bind-Value="AddEditPersonModel.MobileNumber" Label="" />
+                    </MudItem>
+                    <MudItem xs="12" md="12">
+                        <div style="background-color: blue; color: white; font-weight: bold; padding: 4px; font-size: 12px;">
+                            PRESENT ADDRESS
+                        </div>
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <div>
+                            @_localizer["House/Village"]
+                        </div>
+                        <MudTextField For="@(() => AddEditPersonModel.HouseVillage)" @bind-Value="AddEditPersonModel.HouseVillage" Label="" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <div>
+                            @_localizer["Road/Block/Sector/Post Office "]
+                        </div>
+                        <MudTextField For="@(() => AddEditPersonModel.StreetAddress)" @bind-Value="AddEditPersonModel.StreetAddress" Label="" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <div>
+                            @_localizer["Division"]
+                        </div>
+                        <MudAutocomplete T="int" Label="@_localizer["Select"]" For="@(() => AddEditPersonModel.DivisionId)" @bind-Value="AddEditPersonModel.DivisionId" ResetValueOnEmptyText="true" SearchFunc="@SearchDivisions" ToStringFunc="@(i => _divisions.FirstOrDefault(b => b.Id == i)?.Name ?? string.Empty)" OffsetY="true" Filter="Auto.None" />
+                    </MudItem>
+                <MudItem xs="12" md="4">
+                        <div>
+                            @_localizer["District"]
+                        </div>
+                        <MudAutocomplete T="int" Label="@_localizer["Select"]" For="@(() => AddEditPersonModel.DistrictId)" @bind-Value="AddEditPersonModel.DistrictId" ResetValueOnEmptyText="true" SearchFunc="@SearchDistricts" ToStringFunc="@(i => _districts.FirstOrDefault(b => b.Id == i)?.Name ?? string.Empty)" OffsetY="true" Filter="Auto.None" />
+                    </MudItem>
+                <MudItem xs="12" md="3">
+                        <div>
+                            @_localizer["Upazila/Thana"]
+                        </div>
+                        <MudAutocomplete T="int" Label="" For="@(() => AddEditPersonModel.UpazilaId)" @bind-Value="AddEditPersonModel.UpazilaId" ResetValueOnEmptyText="true" SearchFunc="@SearchUpazilas"  ToStringFunc="@(i => _upazilas.FirstOrDefault(b => b.Id == i)?.Name ?? string.Empty)" OffsetY="true" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <div>
+                            @_localizer["Union/Ward"]
+                        </div>
+                        <MudAutocomplete T="int" Label="@_localizer["Select"]" For="@(() => AddEditPersonModel.WardId)" @bind-Value="AddEditPersonModel.WardId" ResetValueOnEmptyText="true" SearchFunc="@SearchWards" ToStringFunc="@(i => _wards.FirstOrDefault(b => b.Id == i)?.Name ?? string.Empty)" OffsetY="true" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <div>
+                            @_localizer["Post Code"]
+                        </div>
+                        <MudTextField For="@(() => AddEditPersonModel.PostCode)" @bind-Value="AddEditPersonModel.PostCode" Label="" />
+                    </MudItem>
+
+                    <MudItem xs="12" md="12">
+                        <div style="background-color: blue; color: white; font-weight: bold; padding: 4px; font-size: 12px;">
+                            PERMANENT ADDRESS
+                        </div>
+                    </MudItem>
+                    <MudItem xs="12" md="12">
+                        <MudCheckBox @bind-Checked="IsSameAsPresentAddress" Label="Same as Present Address"></MudCheckBox>
+                        
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <div>
+                            @_localizer["House/Village"]
+                        </div>
+                        <MudTextField For="@(() => AddEditPersonModel.HouseVillage2)" @bind-Value="AddEditPersonModel.HouseVillage2" Label="" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <div>
+                            @_localizer["Road/Block/Sector/Post Office "]
+                        </div>
+                        <MudTextField For="@(() => AddEditPersonModel.StreetAddress2)" @bind-Value="AddEditPersonModel.StreetAddress2" Label="" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <div>
+                            @_localizer["Division"]
+                        </div>
+                        <MudAutocomplete T="int" Label="@_localizer["Select"]" For="@(() => AddEditPersonModel.DivisionId2)" @bind-Value="AddEditPersonModel.DivisionId2" ResetValueOnEmptyText="true" SearchFunc="@SearchDivisions" ToStringFunc="@(i => _divisions.FirstOrDefault(b => b.Id == i)?.Name ?? string.Empty)" OffsetY="true" Filter="Auto.None" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <div>
+                            @_localizer["District"]
+                        </div>
+                        <MudAutocomplete T="int" Label="@_localizer["Select"]" For="@(() => AddEditPersonModel.DistrictId2)" @bind-Value="AddEditPersonModel.DistrictId2" ResetValueOnEmptyText="true" SearchFunc="@SearchDistricts"  ToStringFunc="@(i => _districts.FirstOrDefault(b => b.Id == i)?.Name ?? string.Empty)" OffsetY="true" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <div>
+                            @_localizer["Upazila/Thana"]
+                        </div>
+                        <MudAutocomplete T="int" Label="@_localizer["Select"]" For="@(() => AddEditPersonModel.UpazilaId2)" @bind-Value="AddEditPersonModel.UpazilaId2" ResetValueOnEmptyText="true" SearchFunc="@SearchUpazilas"  ToStringFunc="@(i => _upazilas.FirstOrDefault(b => b.Id == i)?.Name ?? string.Empty)" OffsetY="true" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <div>
+                            @_localizer["Union/Ward"]
+                        </div>
+                        <MudAutocomplete T="int" Label="@_localizer["Select"]" For="@(() => AddEditPersonModel.WardId2)" @bind-Value="AddEditPersonModel.WardId2" ResetValueOnEmptyText="true" SearchFunc="@SearchWards" ToStringFunc="@(i => _wards.FirstOrDefault(b => b.Id == i)?.Name ?? string.Empty)" OffsetY="true" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <div>
+                            @_localizer["Post Code"]
+                        </div>
+                        <MudTextField For="@(() => AddEditPersonModel.PostCode2)" @bind-Value="AddEditPersonModel.PostCode2" Label="" />
+                    </MudItem>
+                    <MudItem xs="12" md="12">
+                        <div style="background-color: blue; color: white; font-weight: bold; padding: 4px; font-size: 12px;">
+                            SCREENING INFORMATION
+                        </div>
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <div>
+                            @_localizer["Country Returned From"]
+                        </div>
+                        <MudAutocomplete T="int" Label="@_localizer["Select"]" For="@(() => AddEditPersonModel.FromCountryId)" @bind-Value="AddEditPersonModel.FromCountryId" ResetValueOnEmptyText="true" SearchFunc="@SearchFromCountries" ToStringFunc="@(i => _fromCountries.FirstOrDefault(b => b.Id == i)?.Name ?? string.Empty)" OffsetY="true" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <div>
+                            @_localizer["Reason for Return"]
+                        </div>
+                        <MudTextField For="@(() => AddEditPersonModel.ReturnReason)" @bind-Value="AddEditPersonModel.ReturnReason" Label="" />
+                    </MudItem>
+                    <MudItem xs="12" md="3">
+                        <div>
+                            @_localizer["Date of Return"]
+                        </div>
+                        <MudDatePicker @bind-Date="AddEditPersonModel.ReturnDate" Label="" />
+                    </MudItem>
+
+                    <MudItem xs="12" md="4">
+                        <div>
+                            @_localizer["Return Supporting Document"]
+                        </div>
+                        <MudTextField For="@(() => AddEditPersonModel.ReturnDocument)" @bind-Value="AddEditPersonModel.ReturnDocument" Label="" />
+                    </MudItem>
+                
+                @*<MudItem xs="12" md="4">
+                    <MudItem>
+                        <MudAvatar Image="@(AddEditPersonModel.ImageDataURL)" Square="true" Style="height: auto; width: auto; max-height: 100%"> </MudAvatar>
+                    </MudItem>
+                    <MudItem>
+                        <InputFile id="fileInput" hidden OnChange="UploadFiles" />
+                        <div>
+                            <MudButton HtmlTag="label"
+                                       Variant="Variant.Text"
+                                       Color="Color.Primary"
+                                       Size="Size.Small"
+                                       StartIcon="@Icons.Filled.CloudUpload"
+                                       for="fileInput">
+                                @_localizer["Upload"]
+                            </MudButton>
+                            @if (!string.IsNullOrEmpty(AddEditPersonModel.ImageDataURL))
+                            {
+                                <MudButton Variant="Variant.Text"
+                                           Color="Color.Info"
+                                           StartIcon="@Icons.Filled.RemoveRedEye"
+                                           Size="Size.Small"
+                                           Link="@(AddEditPersonModel.ImageDataURL)" Target="_blank">
+                                    @_localizer["View"]
+                                </MudButton>
+                                <MudButton Variant="Variant.Text"
+                                           Color="Color.Error"
+                                           StartIcon="@Icons.Filled.Delete"
+                                           Size="Size.Small"
+                                           OnClick="DeleteAsync">
+                                    @_localizer["Delete"]
+                                </MudButton>
+                            }
+                        </div>
+                    </MudItem>
+                </MudItem>*@
+            </MudGrid>
+            </div>
+        </DialogContent>
+        <DialogActions>
+            <MudButton DisableElevation Variant="Variant.Filled" OnClick="Cancel">@_localizer["Cancel"]</MudButton>
+            @if (AddEditPersonModel.Id != 0)
+            {
+                <MudButton DisableElevation Variant="Variant.Filled" ButtonType="ButtonType.Submit" Disabled="@(!Validated)" Color="Color.Secondary">@_localizer["Update"]</MudButton>
+            }
+            else
+            {
+                <MudButton DisableElevation Variant="Variant.Filled" ButtonType="ButtonType.Submit" Disabled="@(!Validated)" Color="Color.Success">@_localizer["Save"]</MudButton>
+            }
+        </DialogActions>
+    </MudDialog>
+</EditForm>
